@@ -12,7 +12,8 @@ else
 	exit 255
 fi
 
-[ -f configure ] || ./autogen.sh
+[ -f configure ] || (./autogen.sh CFLAGS=-fPIC CXXFLAGS=-fPIC --host=$ndk_triple --without-python && make distclean)
+
 
 mkdir -p _build$ndk_suffix
 cd _build$ndk_suffix
@@ -26,6 +27,7 @@ cd _build$ndk_suffix
     --with-threads \
     --with-tree \
     --without-lzma \
+    --without-python
 
 make -j$cores
 make DESTDIR="$prefix_dir" install

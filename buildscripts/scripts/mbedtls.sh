@@ -14,5 +14,11 @@ fi
 
 $0 clean # separate building not supported, always clean
 
+# fix mbedtls on x86
+if [[ "$ndk_triple" == "i686"* ]]; then
+	./scripts/config.py unset MBEDTLS_AESNI_C
+else
+	./scripts/config.py set MBEDTLS_AESNI_C
+fi
 make CFLAGS=-fPIC CXXFLAGS=-fPIC -j$cores no_test
 make CFLAGS=-fPIC CXXFLAGS=-fPIC DESTDIR="$prefix_dir" install

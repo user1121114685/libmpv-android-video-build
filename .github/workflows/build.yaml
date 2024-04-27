@@ -1,6 +1,9 @@
 name: Build libmpv-android
 
 on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 14 * * 1'
   push:
     branches:
       - main
@@ -10,7 +13,7 @@ permissions:
   contents: write
 
 env:
-  NDK_VER: 25.1.8937393
+  NDK_VER: r26c
 
 jobs:
   build:
@@ -24,17 +27,25 @@ jobs:
         with:
           distribution: temurin
           java-version: 11
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "^1.x"
+          check-latest: true
+      - name: Display Go version
+        run: go version
       - name: Setup Flutter SDK
         uses: subosito/flutter-action@v1
         with:
           channel: "stable"
       - name: Gradle Build Action
         uses: gradle/gradle-build-action@v2.3.3
-      - name: Cache
-        uses: actions/cache@v3.2.4
+      - name: Setup NDK
+        uses: nttld/setup-ndk@v1
+        id: setup-ndk
         with:
-          path: /usr/local/lib/android/sdk/ndk/${{ env.NDK_VER }}
-          key: ${{ runner.os }}-${{ env.NDK_VER }}
+          ndk-version: ${{ env.NDK_VER }}
+          link-to-sdk: true
       - name: Symlink SDK
         working-directory: ./buildscripts
         run: |
@@ -45,25 +56,24 @@ jobs:
         run: |
           sudo chmod +x bundle_default.sh
           ./bundle_default.sh
-      - name: Bundle (full)
-        working-directory: ./buildscripts
-        run: |
-          sudo chmod +x bundle_full.sh
-          ./bundle_full.sh
-      - name: Bundle (encoders-gpl)
-        working-directory: ./buildscripts
-        run: |
-          sudo chmod +x bundle_encoders-gpl.sh
-          ./bundle_encoders-gpl.sh
-      - uses: actions/upload-artifact@v3.1.2
-        with:
-          name: artifact
-          path: ./output/*
+        env:
+           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+
+#      - name: Bundle (full)
+#        working-directory: ./buildscripts
+#        run: |
+#          sudo chmod +x bundle_full.sh
+#          ./bundle_full.sh
+#        env:
+#           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+
+      - id: set_tag_date
+        run: echo "tag_date=$(date +'%Y%m%d')" >> $GITHUB_ENV
       - uses: softprops/action-gh-release@v1
         if: github.ref == 'refs/heads/main'
         with:
-          draft: true
+          draft: false
           prerelease: false
-          tag_name: "vnext"
+          tag_name: ${{ env.tag_date }}
           files: |
             output/*

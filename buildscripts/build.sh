@@ -16,7 +16,7 @@ getdeps () {
 loadarch () {
 	unset CC CXX CPATH LIBRARY_PATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH
 
-	local apilvl=21
+	local apilvl=23 #6.0 是 23 // 7.0 是 24 https://developer.android.com/tools/releases/platforms?hl=zh-cn
 	# ndk_triple: what the toolchain actually is
 	# cc_triple: what Google pretends the toolchain is
 	if [ "$1" == "armv7l" ]; then
@@ -82,8 +82,10 @@ wrap_mode = 'nodownload'
 c = '$CC'
 cpp = '$CXX'
 ar = '$AR'
+nm = 'llvm-nm'
 strip = '$ndk_triple-strip'
 pkgconfig = 'pkg-config'
+pkg-config = 'pkg-config'
 [host_machine]
 system = 'android'
 cpu_family = '$cpu_family'
