@@ -30,10 +30,20 @@ sudo chmod +x gradlew
 
 unzip -q -o app/build/outputs/apk/release/app-release.apk -d app/build/outputs/apk/release
 
-ln -sf "$(pwd)/app/build/outputs/apk/release/lib/arm64-v8a/libmediakitandroidhelper.so" "../../../libmpv/src/main/jniLibs/arm64-v8a"
-ln -sf "$(pwd)/app/build/outputs/apk/release/lib/armeabi-v7a/libmediakitandroidhelper.so" "../../../libmpv/src/main/jniLibs/armeabi-v7a"
-ln -sf "$(pwd)/app/build/outputs/apk/release/lib/x86/libmediakitandroidhelper.so" "../../../libmpv/src/main/jniLibs/x86"
-ln -sf "$(pwd)/app/build/outputs/apk/release/lib/x86_64/libmediakitandroidhelper.so" "../../../libmpv/src/main/jniLibs/x86_64"
+# 设置jniLibs目录的路径
+jniLibs_dir="../../../libmpv/src/main/jniLibs"
+
+# 创建符号链接
+for arch in arm64-v8a armeabi-v7a x86 x86_64; do
+  ln -sf "$(pwd)/app/build/outputs/apk/release/lib/$arch/libmediakitandroidhelper.so" "$jniLibs_dir/$arch"
+done
+
+# 链接ffmpeg的相关库
+for lib in libswscale libswresample libpostproc libavutil libavformat libavfilter libavdevice libavcodec; do
+  for arch in arm64-v8a armeabi-v7a x86 x86_64; do
+    ln -sf prefix"/$arch/lib/$lib.so" "$jniLibs_dir/$arch"
+  done
+done
 
 cd ../..
 
