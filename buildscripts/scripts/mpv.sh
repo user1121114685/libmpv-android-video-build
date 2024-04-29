@@ -35,4 +35,5 @@ meson setup $build --cross-file "$prefix_dir"/crossfile.txt \
 ninja -C $build -j$cores
 DESTDIR="$prefix_dir" ninja -C $build install
 
+echo "当前 native_dir 目录路径是 $native_dir"
 ln -sf "$prefix_dir"/lib/libmpv.so "$native_dir"

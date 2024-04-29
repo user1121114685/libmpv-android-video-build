@@ -38,12 +38,6 @@ for arch in arm64-v8a armeabi-v7a x86 x86_64; do
   ln -sf "$(pwd)/app/build/outputs/apk/release/lib/$arch/libmediakitandroidhelper.so" "$jniLibs_dir/$arch"
 done
 
-# 链接ffmpeg的相关库
-for lib in libswscale libswresample libpostproc libavutil libavformat libavfilter libavdevice libavcodec; do
-  for arch in arm64-v8a armeabi-v7a x86 x86_64; do
-    ln -sf prefix"/$arch/lib/$lib.so" "$jniLibs_dir/$arch"
-  done
-done
 
 cd ../..
 
