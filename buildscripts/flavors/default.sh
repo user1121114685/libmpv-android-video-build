@@ -38,14 +38,4 @@ cpuflags=
 make -j$cores
 make DESTDIR="$prefix_dir" install
 
-echo "当前 native_dir 目录路径是 $native_dir"
-
-mkdir -p "$native_dir" && cp "$prefix_dir"/lib/libswscale.so "$native_dir"
-mkdir -p "$native_dir" && cp "$prefix_dir"/lib/libswresample.so "$native_dir"
-mkdir -p "$native_dir" && cp "$prefix_dir"/lib/libpostproc.so "$native_dir"
-mkdir -p "$native_dir" && cp "$prefix_dir"/lib/libavutil.so "$native_dir"
-mkdir -p "$native_dir" && cp "$prefix_dir"/lib/libavformat.so "$native_dir"
-mkdir -p "$native_dir" && cp "$prefix_dir"/lib/libavfilter.so "$native_dir"
-mkdir -p "$native_dir" && cp "$prefix_dir"/lib/libavdevice.so "$native_dir"
-mkdir -p "$native_dir" && cp "$prefix_dir"/lib/libavcodec.so "$native_dir"
 
