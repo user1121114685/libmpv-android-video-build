@@ -98,3 +98,6 @@ jobs:
           tag_name: ${{ env.tag_date }}
           files: |
             output/*
+      - name: Show Space
+        run: |
+          df -hT $PWD
