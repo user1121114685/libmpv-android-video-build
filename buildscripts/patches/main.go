@@ -23,7 +23,7 @@ func main() {
 
 	//  下面是mpv 补丁 mpv_lavc_set_java_vm.patch
 	insertFile(mpv_path+"/libmpv/client.h", "MPV_EXPORT void mpv_wakeup(mpv_handle *ctx);", "MPV_EXPORT int av_jni_set_java_vm(void *vm, void *log_ctx);")
-	insertFile(mpv_path+"/player/client.c", "#include <assert.h>", "#include <libavcodec/jni.h>")
+	insertFile(mpv_path+"/player/client.c", "#include <assert.h>", "extern \"C\" {\n    #include <libavcodec/jni.h>\n}")
 	// insertFile(mpv_path+"/libmpv/client.h", "MPV_EXPORT void mpv_wakeup(mpv_handle *ctx);", "MPV_EXPORT int mpv_lavc_set_java_vm(void *vm);")
 	// insertFile(mpv_path+"/player/client.c", "#include <assert.h>", "#include <libavcodec/jni.h>")
 	// insertFile(mpv_path+"/player/client.c", "// map client API types to internal types", "int mpv_lavc_set_java_vm(void *vm) {\n    return av_jni_set_java_vm(vm, NULL);\n}")
