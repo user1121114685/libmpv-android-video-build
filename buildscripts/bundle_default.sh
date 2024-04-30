@@ -38,14 +38,6 @@ jniLibs_dir="../../../libmpv/src/main/jniLibs"
 for arch in arm64-v8a armeabi-v7a x86 x86_64; do
   ln -sf "$(pwd)/app/build/outputs/apk/release/lib/$arch/libmediakitandroidhelper.so" "$jniLibs_dir/$arch"
 done
-# // /home/runner/work/libmpv-android-video-build/libmpv-android-video-build/buildscripts/prefix/armeabi-v7a/usr/local/lib/libavformat.so
-# 链接ffmpeg的相关库
-for lib in libswscale libswresample libpostproc libavutil libavformat libavfilter libavdevice libavcodec; do
-  for arch in arm64-v8a armeabi-v7a x86 x86_64; do
-    echo "$ffmpeg_prefix/$arch/usr/local/lib/$lib.so" "$jniLibs_dir/$arch"
-    ln -sf "$ffmpeg_prefix/$arch/usr/local/lib/$lib.so" "$jniLibs_dir/$arch"
-  done
-done
 
 cd ../..
 
