@@ -27,7 +27,7 @@ func main() {
 	// insertFile(mpv_path+"/libmpv/client.h", "MPV_EXPORT void mpv_wakeup(mpv_handle *ctx);", "MPV_EXPORT int mpv_lavc_set_java_vm(void *vm);")
 	// insertFile(mpv_path+"/player/client.c", "#include <assert.h>", "#include <libavcodec/jni.h>")
 	// insertFile(mpv_path+"/player/client.c", "// map client API types to internal types", "int mpv_lavc_set_java_vm(void *vm) {\n    return av_jni_set_java_vm(vm, NULL);\n}")
-	// insertFile(mpv_path+"/meson.build", "link_flags = []", "dependencies +=cc.find_library('c++', required : true)\nlink_flags +=['-stdlib=libc++']")
+	insertFile(mpv_path+"/meson.build", "link_flags = []", "dependencies +=cc.find_library('c++', required : true)\nlink_flags +=['-stdlib=libc++']")
 	// 修复在安卓下 断言错误   // ../player/loadfile.c:1920: void play_current_file(struct MPContext *): assertion "mpctx->stop_play" failed
 	// 还原 这个修复  https://github.com/mpv-player/mpv/issues/10782  我觉得是同一个问题
 	//replaceFile(mpv_path+"/player/command.c", "            int old_stop_play = mpctx->stop_play;\n            if (old_stop_play == AT_END_OF_FILE)\n                mpctx->play_dir = opts->play_dir;\n            queue_seek(mpctx, MPSEEK_ABSOLUTE, get_current_time(mpctx),\n                       MPSEEK_EXACT, 0);\n            if (old_stop_play == AT_END_OF_FILE)\n                mpctx->stop_play = old_stop_play;\n        }", "            queue_seek(mpctx, MPSEEK_ABSOLUTE, get_current_time(mpctx),")
