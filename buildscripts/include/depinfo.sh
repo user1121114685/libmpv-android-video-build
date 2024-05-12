@@ -16,7 +16,7 @@ v_unibreak=master
 v_mbedtls=development
 v_dav1d=master
 v_libxml2=master
-v_ffmpeg=78d43740f52db817d98bcf24fb30a76ab6fa13ff
+v_ffmpeg=master
 v_mpv=master
 
 # 新增部分
