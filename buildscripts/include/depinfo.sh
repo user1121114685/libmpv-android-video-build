@@ -16,7 +16,7 @@ v_unibreak=master
 v_mbedtls=development
 v_dav1d=master
 v_libxml2=master
-v_ffmpeg=release/6.1
+v_ffmpeg=release/6.0
 v_mpv=master
 
 # 新增部分
