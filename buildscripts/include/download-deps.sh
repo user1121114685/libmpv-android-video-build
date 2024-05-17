@@ -37,21 +37,23 @@ mkdir -p deps && cd deps
 [ ! -d libplacebo ] && git clone --depth 1 --branch $v_libplacebo --recursive https://code.videolan.org/videolan/libplacebo.git libplacebo
 
 # mpv
-[ ! -d mpv ] && git clone --branch $v_mpv https://github.com/mpv-player/mpv.git mpv
+[ ! -d mpv ] && git clone --depth 1 --branch $v_mpv https://github.com/mpv-player/mpv.git mpv
 
-cd mpv
-git config --global user.email "admin@shaoxia.xyz"
-git config --global user.name "联盟少侠"
- # 添加 PR 提交者的仓库作为新的远程仓库
-git remote add pr-remote https://github.com/Dudemanguy/mpv.git
-
- # 获取 PR 提交者的仓库更新
-git fetch pr-remote
-
- # 直接合并 PR 分支到您当前的分支
-git merge pr-remote/queue-seek-stop-play
-
-cd ..
+#[ ! -d mpv ] && git clone --branch $v_mpv https://github.com/mpv-player/mpv.git mpv
+#
+#cd mpv
+#git config --global user.email "admin@shaoxia.xyz"
+#git config --global user.name "联盟少侠"
+# # 添加 PR 提交者的仓库作为新的远程仓库
+#git remote add pr-remote https://github.com/Dudemanguy/mpv.git
+#
+# # 获取 PR 提交者的仓库更新
+#git fetch pr-remote
+#
+# # 直接合并 PR 分支到您当前的分支
+#git merge pr-remote/queue-seek-stop-play
+#
+#cd ..
 
 # media-kit-android-helper
 [ ! -d media-kit-android-helper ] && git clone --depth 1 --branch main https://github.com/media-kit/media-kit-android-helper.git
