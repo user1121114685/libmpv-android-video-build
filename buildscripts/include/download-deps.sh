@@ -22,7 +22,7 @@ mkdir -p deps && cd deps
 [ ! -d ffmpeg ] && git clone --depth 1 --branch $v_ffmpeg https://github.com/FFmpeg/FFmpeg.git ffmpeg
 
 # freetype2
-[ ! -d freetype2 ] && git clone --recurse-submodules --depth 1 --branch $v_freetype https://gitlab.freedesktop.org/freetype/freetype.git freetype2
+[ ! -d freetype2 ] && git clone --recurse-submodules --depth 1 --branch $v_freetype https://github.com/freetype/freetype.git freetype2
 
 # fribidi
 [ ! -d fribidi ] && git clone --depth 1 --branch $v_fribidi https://github.com/fribidi/fribidi.git fribidi
