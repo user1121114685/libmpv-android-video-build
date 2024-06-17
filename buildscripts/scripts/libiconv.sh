@@ -12,6 +12,7 @@ else
 	exit 255
 fi
 
+[ ! -d "gnulib" ] && ./gitsub.sh pull
 [ -f configure ] || ./autogen.sh
 
 mkdir -p _build$ndk_suffix
