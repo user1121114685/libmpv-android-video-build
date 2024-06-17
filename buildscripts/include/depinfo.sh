@@ -18,6 +18,7 @@ v_dav1d=master
 v_libxml2=master
 v_ffmpeg=master
 v_mpv=master
+v_libiconv=master
 
 # 新增部分
 v_libplacebo=master
@@ -33,7 +34,8 @@ dep_freetype2=()
 dep_fribidi=()
 dep_harfbuzz=()
 dep_unibreak=()
-dep_libass=(freetype2 fribidi harfbuzz unibreak)
+dep_libxml2=(libiconv)
+dep_libass=(freetype2 fribidi harfbuzz unibreak libiconv)
 dep_lua=()
 #dep_shaderc=()
 dep_libplacebo=()

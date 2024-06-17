@@ -12,6 +12,9 @@ mkdir -p deps && cd deps
 # dav1d
 [ ! -d dav1d ] && git clone --depth 1 --branch $v_dav1d https://code.videolan.org/videolan/dav1d.git dav1d
 
+# libiconv
+[ ! -d libiconv ] && git clone --depth 1 --branch $v_libiconv https://git.savannah.gnu.org/git/libiconv.git libiconv
+
 # libxml2
 [ ! -d libxml2 ] && git clone --depth 1 --branch $v_libxml2 --recursive https://gitlab.gnome.org/GNOME/libxml2.git libxml2
 
