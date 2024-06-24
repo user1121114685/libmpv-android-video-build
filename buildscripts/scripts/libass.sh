@@ -21,7 +21,7 @@ meson setup $build --cross-file "$prefix_dir"/crossfile.txt \
   --default-library=static \
   -Dfontconfig=disabled \
   -Ddirectwrite=disabled \
-  -Dasm=enabled \
+  -Dasm=disabled \
   -Dlibunibreak=enabled \
   -Drequire-system-font-provider=false
 
