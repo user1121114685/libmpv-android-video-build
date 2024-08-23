@@ -18,10 +18,8 @@ unset CC CXX # meson wants these unset
 
 meson setup $build --cross-file "$prefix_dir"/crossfile.txt \
   --buildtype=release \
-  --default-library=static \
   -Dfontconfig=disabled \
   -Ddirectwrite=disabled \
-  -Dasm=enabled \
   -Dlibunibreak=enabled \
   -Drequire-system-font-provider=false
 
