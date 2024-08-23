@@ -16,8 +16,10 @@ fi
 
 unset CC CXX
 meson setup $build --wipe --cross-file "$prefix_dir"/crossfile.txt \
-	-Dvulkan=disabled -Ddemos=false -Ddefault_library=static
+	-Dvulkan=disabled -Ddemos=false
 
 ninja -C $build -j$cores
 DESTDIR="$prefix_dir" ninja -C $build install
-#${SED:-sed} '/^Libs:/ s|-lc++|-static-libc++|' "$prefix_dir/lib/pkgconfig/libplacebo.pc" -i
+# add missing library for static linking
+# this isn't "-lstdc++" due to a meson bug: https://github.com/mesonbuild/meson/issues/11300
+${SED:-sed} '/^Libs:/ s|$| -lc++|' "$prefix_dir/lib/pkgconfig/libplacebo.pc" -i
