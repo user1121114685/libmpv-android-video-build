@@ -42,12 +42,12 @@ jobs:
         run: |
           df -hT $PWD
       - name: Checkout repository
-        uses: actions/checkout@v3.3.0
+        uses: actions/checkout@v4
       - name: Setup Java JDK
-        uses: actions/setup-java@v3.9.0
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 11
+          java-version: 17
       - name: Setup Go
         uses: actions/setup-go@v5
         with:

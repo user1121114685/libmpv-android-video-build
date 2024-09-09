@@ -55,14 +55,14 @@ flutter pub get
 
 cp -a ../../mpv/libmpv/. src/include/
 
-cd example
+cd example || exit
 
 flutter clean
 flutter build apk --release
 
 unzip -q -o build/app/outputs/apk/release/app-release.apk -d build/app/outputs/apk/release
 
-cd build/app/outputs/apk/release/
+cd build/app/outputs/apk/release/ || exit
 
 # --------------------------------------------------
 
@@ -78,14 +78,6 @@ ln -sf "$c_shere_so/x86_64-linux-android/libc++_shared.so" "./lib/x86_64"
 tree -d $c_shere_so
 tree -a
 
-# // /home/runner/work/libmpv-android-video-build/libmpv-android-video-build/buildscripts/prefix/armeabi-v7a/usr/local/lib/libavformat.so
-# 链接ffmpeg的相关库
-for lib in libswscale libswresample libpostproc libavutil libavformat libavfilter libavdevice libavcodec; do
-  for arch in arm64-v8a armeabi-v7a x86 x86_64; do
-    echo "连接目标 $ffmpeg_prefix/$arch/usr/local/lib/$lib.so" "./lib/$arch"
-    ln -sf "$ffmpeg_prefix/$arch/usr/local/lib/$lib.so" "./lib/$arch"
-  done
-done
 zip -r "default-arm64-v8a.jar"                lib/arm64-v8a
 zip -r "default-armeabi-v7a.jar"              lib/armeabi-v7a
 zip -r "default-x86.jar"                      lib/x86
