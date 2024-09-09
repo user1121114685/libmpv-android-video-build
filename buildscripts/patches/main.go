@@ -22,24 +22,14 @@ func main() {
 	//libplacebo_path := "./deps/libplacebo"
 
 	//  下面是mpv 补丁 mpv_lavc_set_java_vm.patch
-	//insertFile(mpv_path+"/libmpv/client.h", "MPV_EXPORT void mpv_wakeup(mpv_handle *ctx);", "MPV_EXPORT int av_jni_set_java_vm(void *vm, void *log_ctx);")
-	//insertFile(mpv_path+"/player/client.c", "#include <assert.h>", "#include <libavcodec/jni.h>")
-	// insertFile(mpv_path+"/libmpv/client.h", "MPV_EXPORT void mpv_wakeup(mpv_handle *ctx);", "MPV_EXPORT int mpv_lavc_set_java_vm(void *vm);")
-	// insertFile(mpv_path+"/player/client.c", "#include <assert.h>", "#include <libavcodec/jni.h>")
-	// insertFile(mpv_path+"/player/client.c", "// map client API types to internal types", "int mpv_lavc_set_java_vm(void *vm) {\n    return av_jni_set_java_vm(vm, NULL);\n}")
-	insertFile(mpv_path+"/meson.build", "link_flags = []", "dependencies +=cc.find_library('c++', required : true)\nlink_flags +=['-stdlib=libc++']")
-	// 修复在安卓下 断言错误   // ../player/loadfile.c:1920: void play_current_file(struct MPContext *): assertion "mpctx->stop_play" failed
-	// 还原 这个修复  https://github.com/mpv-player/mpv/issues/10782  我觉得是同一个问题
-	//replaceFile(mpv_path+"/player/command.c", "            if (old_stop_play == AT_END_OF_FILE)\n                mpctx->play_dir = opts->play_dir;\n            queue_seek(mpctx, MPSEEK_ABSOLUTE, get_current_time(mpctx),\n                       MPSEEK_EXACT, 0);\n            if (old_stop_play == AT_END_OF_FILE)\n                mpctx->stop_play = old_stop_play;", "            mpctx->play_dir = opts->play_dir;\n            queue_seek(mpctx, MPSEEK_ABSOLUTE, get_current_time(mpctx),\n                       MPSEEK_EXACT, 0);\n            mpctx->stop_play = old_stop_play;")
-	// replaceFile(mpv_path+"/player/command.c", "        if (track)\n            queue_seek(mpctx, MPSEEK_RELATIVE, 0.0, MPSEEK_EXACT, 0);", "if (track) {\n    int old_stop_play = mpctx->stop_play;\n    if (old_stop_play == AT_END_OF_FILE) {\n        mpctx->play_dir = opts->play_dir;\n    }\n    queue_seek(mpctx, MPSEEK_RELATIVE, 0.0, MPSEEK_EXACT, 0);\n    if (old_stop_play == AT_END_OF_FILE) {\n        mpctx->stop_play = old_stop_play;\n    }\n}")
-	//replaceFile(mpv_path+"/player/loadfile.c", "    assert(mpctx->stop_play);\n\n    process_hooks(mpctx, \"on_after_end_file\");", "    mp_abort_playback_async(mpctx);\n    assert(mpctx->stop_play);\n\n    process_hooks(mpctx, \"on_after_end_file\");")
+	insertFile(mpv_path+"/libmpv/client.h", "MPV_EXPORT void mpv_wakeup(mpv_handle *ctx);", "MPV_EXPORT int av_jni_set_java_vm(void *vm, void *log_ctx);")
+	insertFile(mpv_path+"/player/client.c", "#include <assert.h>", "#include <libavcodec/jni.h>")
+	insertFile(mpv_path+"/libmpv/client.h", "MPV_EXPORT void mpv_wakeup(mpv_handle *ctx);", "MPV_EXPORT int mpv_lavc_set_java_vm(void *vm);")
+	insertFile(mpv_path+"/player/client.c", "#include <assert.h>", "#include <libavcodec/jni.h>")
+	insertFile(mpv_path+"/player/client.c", "// map client API types to internal types", "int mpv_lavc_set_java_vm(void *vm) {\n    return av_jni_set_java_vm(vm, NULL);\n}")
 
-	// 修复 部分华为手机黑屏的问题 兼容华为https://juejin.cn/post/7200191765516501049 主要是安卓9和安卓10的华为手机
-	// replaceFile(mpv_path+"/video/out/gpu/video.c", "    const char *auto_fbo_fmts[] = {\"rgba16f\", \"rgba16hf\", \"rgba16\",", "    const char *auto_fbo_fmts[] = {\"rgb16f\",\"rgba16f\", \"rgba16hf\", \"rgba16\",")
-	// 因为华为手机是 openGLes 3.2+ 所以 修改/video/out/opengl/formats.c On ES3.2+, both 16 bit floats work fully (except 3-component formats). 这部分就好了
-	//insertFile(mpv_path+"/video/out/gpu/ra.c", "    {RA_CTYPE_FLOAT, 4, {16, 16, 16, 16}, \"rgba16f\"},", "    {RA_CTYPE_FLOAT, 3, {16, 16, 16}, \"rgb16f\"},")
-	// replaceFile(mpv_path+"/video/out/opengl/formats.c", "    {\"rgb16f\",  GL_RGB16F,   GL_RGB,             T_FL,  F_F16 | F_TF | F_ES32 | F_EXTF16},", "    {\"rgb16f\",  GL_RGB16F,   GL_RGB,             T_FL,  F_F16 | F_CF | F_ES32 | F_EXTF16},")
-	// replaceFile(mpv_path+"/video/out/opengl/formats.c", "    {\"rgb16f\",  GL_RGB16F,   GL_RGB,             T_FL,  F_F16 | F_TF | F_ES3},", "    {\"rgb16f\",  GL_RGB16F,   GL_RGB,             T_FL,  F_F16 | F_CF | F_ES3},")
+	insertFile(mpv_path+"/meson.build", "link_flags = []", "dependencies +=cc.find_library('c++', required : true)\nlink_flags +=['-stdlib=libc++']")
+
 	replaceFile(mpv_path+"/VERSION", "-UNKNOWN", "-little_lucky2_"+time.Now().Format("20060102"))
 
 	// 	//下面是 ffmpeg 补丁
