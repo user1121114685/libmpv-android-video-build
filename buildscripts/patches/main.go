@@ -30,7 +30,7 @@ func main() {
 
 	insertFile(mpv_path+"/meson.build", "link_flags = []", "dependencies +=cc.find_library('c++', required : true)\nlink_flags +=['-stdlib=libc++']")
 
-	replaceFile(mpv_path+"/VERSION", "-UNKNOWN", "-little_lucky2_"+time.Now().Format("20060102"))
+	replaceFile(mpv_path+"/MPV_VERSION", "-UNKNOWN", "-little_lucky2_"+time.Now().Format("20060102"))
 
 	// 	//下面是 ffmpeg 补丁
 	//replaceFile(ffmpeg_path+"/libavformat/dashdec.c", "xmlNodeSetContent(node, root_url);", "char* root_url_content = xmlEncodeSpecialChars(NULL, root_url);\n        xmlNodeSetContent(node, root_url_content);\n        xmlFree(root_url_content);")
