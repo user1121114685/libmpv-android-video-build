@@ -28,7 +28,7 @@ cpuflags=
 	--arch=${ndk_triple%%-*} --cpu=$cpu --pkg-config=pkg-config --nm=llvm-nm \
 	--extra-cflags="-I$prefix_dir/include $cpuflags" --extra-ldflags="-L$prefix_dir/lib" \
 	--enable-{jni,mediacodec,mbedtls,libdav1d} --disable-vulkan \
-	--disable-static --enable-shared\
+	--enable-static --disable-shared\
 	--enable-{gpl,version3} \
 	--disable-{stripping,doc,programs} \
 	--disable-{muxers,encoders,devices} \
@@ -38,4 +38,12 @@ cpuflags=
 make -j$cores
 make DESTDIR="$prefix_dir" install
 
+ln -sf "$prefix_dir"/lib/libswresample.so "$native_dir"
+ln -sf "$prefix_dir"/lib/libpostproc.so "$native_dir"
+ln -sf "$prefix_dir"/lib/libavutil.so "$native_dir"
+ln -sf "$prefix_dir"/lib/libavcodec.so "$native_dir"
+ln -sf "$prefix_dir"/lib/libavformat.so "$native_dir"
+ln -sf "$prefix_dir"/lib/libswscale.so "$native_dir"
+ln -sf "$prefix_dir"/lib/libavfilter.so "$native_dir"
+ln -sf "$prefix_dir"/lib/libavdevice.so "$native_dir"
 
