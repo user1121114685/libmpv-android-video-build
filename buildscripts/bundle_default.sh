@@ -22,7 +22,6 @@ cp flavors/default.sh scripts/ffmpeg.sh
 ./build.sh
 
 # --------------------------------------------------
-ffmpeg_prefix="$(pwd)/prefix"
 
 cd deps/media-kit-android-helper
 
@@ -42,39 +41,39 @@ done
 cd ../..
 
 # --------------------------------------------------
-
-cd deps/media_kit/media_kit_native_event_loop
-
-flutter create --org com.alexmercerind --template plugin_ffi --platforms=android .
-
-if ! grep -q android "pubspec.yaml"; then
-  printf "      android:\n        ffiPlugin: true\n" >> pubspec.yaml
-fi
-
-flutter pub get
-
-cp -a ../../mpv/libmpv/. src/include/
-
-cd example || exit
-
-flutter clean
-flutter build apk --release
-
-unzip -q -o build/app/outputs/apk/release/app-release.apk -d build/app/outputs/apk/release
-
-cd build/app/outputs/apk/release/ || exit
-
-# --------------------------------------------------
-
-rm -r lib/*/libapp.so
-rm -r lib/*/libflutter.so
+#
+#cd deps/media_kit/media_kit_native_event_loop
+#
+#flutter create --org com.alexmercerind --template plugin_ffi --platforms=android .
+#
+#if ! grep -q android "pubspec.yaml"; then
+#  printf "      android:\n        ffiPlugin: true\n" >> pubspec.yaml
+#fi
+#
+#flutter pub get
+#
+#cp -a ../../mpv/libmpv/. src/include/
+#
+#cd example || exit
+#
+#flutter clean
+#flutter build apk --release
+#
+#unzip -q -o build/app/outputs/apk/release/app-release.apk -d build/app/outputs/apk/release
+#
+#cd build/app/outputs/apk/release/ || exit
+#
+## --------------------------------------------------
+#
+#rm -r lib/*/libapp.so
+#rm -r lib/*/libflutter.so
 
 # 链接 c++shared.so
 c_shere_so=$(echo "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/"*"/sysroot/usr/lib")
-ln -sf "$c_shere_so/aarch64-linux-android/libc++_shared.so" "./lib/arm64-v8a"
-ln -sf "$c_shere_so/arm-linux-androideabi/libc++_shared.so" "./lib/armeabi-v7a"
-ln -sf "$c_shere_so/i686-linux-android/libc++_shared.so" "./lib/x86"
-ln -sf "$c_shere_so/x86_64-linux-android/libc++_shared.so" "./lib/x86_64"
+ln -sf "$c_shere_so/aarch64-linux-android/libc++_shared.so" "$jniLibs_dir/arm64-v8a"
+ln -sf "$c_shere_so/arm-linux-androideabi/libc++_shared.so" "$jniLibs_dir/armeabi-v7a"
+ln -sf "$c_shere_so/i686-linux-android/libc++_shared.so" "$jniLibs_dir/x86"
+ln -sf "$c_shere_so/x86_64-linux-android/libc++_shared.so" "$jniLibs_dir/x86_64"
 tree -d $c_shere_so
 tree -a
 
@@ -83,13 +82,13 @@ zip -r "default-armeabi-v7a.jar"              lib/armeabi-v7a
 zip -r "default-x86.jar"                      lib/x86
 zip -r "default-x86_64.jar"                   lib/x86_64
 
-mkdir -p ../../../../../../../../../../output
+mkdir -p ../../output
 
-cp *.jar ../../../../../../../../../../output
+cp *.jar ../../output
 
-md5sum *.jar > ../../../../../../../../../../output/default_md5.txt
+md5sum *.jar > ../../output/default_md5.txt
 
-cd ../../../../../../../../..
+cd ..
 
 # --------------------------------------------------
 
