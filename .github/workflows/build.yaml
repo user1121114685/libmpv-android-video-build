@@ -1,103 +1,100 @@
-name: Build libmpv-android
+name: 更新libmpv和media-kit-android-helper
 
 on:
-  workflow_dispatch:
   schedule:
-    - cron: '0 14 * * 1'
-  push:
-    branches:
-      - main
-  pull_request:
-
-permissions:
-  contents: write
-
-env:
-  NDK_VER: r26c
+    - cron: '0 19 * * *'  # 每天运行一次
+  workflow_dispatch:  # 允许手动触发
 
 jobs:
-  build:
-    name: Build
+  check_and_update:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Show Space
-        run: |
-          df -hT $PWD
-      - name: Free Disk Space (Ubuntu)
-        uses: insightsengineering/disk-space-reclaimer@v1
-        with:
-          # this might remove tools that are actually needed,
-          # if set to "true" but frees about 6 GB
-          tools-cache: false
+    - uses: actions/checkout@v3
 
-          # all of these default to true, but feel free to set to
-          # "false" if necessary for your workflow
-          android: false
-          dotnet: true
-          haskell: true
-          large-packages: true
-          swap-storage: true
-          docker-images: true
-      - name: Show Space
-        run: |
-          df -hT $PWD
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Setup Java JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "^1.x"
-          check-latest: true
-      - name: Display Go version
-        run: go version
-      - name: Setup Flutter SDK
-        uses: subosito/flutter-action@v1
-        with:
-          channel: "stable"
-      - name: Gradle Build Action
-        uses: gradle/gradle-build-action@v2.3.3
-      - name: Setup NDK
-        uses: nttld/setup-ndk@v1
-        id: setup-ndk
-        with:
-          ndk-version: ${{ env.NDK_VER }}
-          link-to-sdk: true
-      - name: Symlink SDK
-        working-directory: ./buildscripts
-        run: |
-          mkdir sdk
-          ln -s ${ANDROID_HOME} ./sdk/android-sdk-linux
-      - name: Bundle (default)
-        working-directory: ./buildscripts
-        run: |
-          sudo chmod +x bundle_default.sh
-          ./bundle_default.sh
-        env:
-           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+    - name: 设置Java JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 17
 
-#      - name: Bundle (full)
-#        working-directory: ./buildscripts
-#        run: |
-#          sudo chmod +x bundle_full.sh
-#          ./bundle_full.sh
-#        env:
-#           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+    - name: 设置标签日期
+      run: echo "tag_date=$(date +'%Y%m%d')" >> $GITHUB_ENV
 
-      - id: set_tag_date
-        run: echo "tag_date=$(date +'%Y%m%d')" >> $GITHUB_ENV
-      - uses: softprops/action-gh-release@v1
-        if: github.ref == 'refs/heads/main'
-        with:
-          draft: false
-          prerelease: false
-          tag_name: ${{ env.tag_date }}
-          files: |
-            output/*
-      - name: Show Space
-        run: |
-          df -hT $PWD
+    - name: 检查libmpv-android更新
+      id: check_libmpv
+      run: |
+        latest_version=$(curl -s https://api.github.com/repos/jarnedemeulemeester/libmpv-android/releases/latest | jq -r .tag_name)
+        echo "Latest version: $latest_version"
+        echo "latest_version=$latest_version" >> $GITHUB_ENV
+        if [ ! -f "last_version.txt" ] || [ "$latest_version" != "$(cat last_version.txt)" ]; then
+          echo "update_available=true" >> $GITHUB_ENV
+        else
+          echo "update_available=false" >> $GITHUB_ENV
+        fi
+
+    - name: 下载最新的libmpv发布版
+      if: env.update_available == 'true'
+      run: |
+        curl -L -o libmpv-release.aar https://github.com/jarnedemeulemeester/libmpv-android/releases/latest/download/libmpv-release.aar
+        echo "${{ env.latest_version }}" > last_version.txt
+
+    - name: 克隆media-kit-android-helper
+      if: env.update_available == 'true'
+      run: git clone --depth 1 --branch main https://github.com/media-kit/media-kit-android-helper.git
+
+    - name: 构建media-kit-android-helper
+      if: env.update_available == 'true'
+      run: |
+        cd media-kit-android-helper
+        chmod +x gradlew
+        ./gradlew assembleRelease
+        unzip -q -o app/build/outputs/apk/release/app-release.apk -d app/build/outputs/apk/release
+
+    - name: 提取并合并库文件
+      if: env.update_available == 'true'
+      run: |
+        mkdir -p lib/{arm64-v8a,armeabi-v7a,x86,x86_64}
+        unzip -j libmpv-release.aar 'jni/*' -d lib
+        cp media-kit-android-helper/app/build/outputs/apk/release/lib/*/libmediakitandroidhelper.so lib/
+
+    - name: 创建JAR文件并计算MD5
+      if: env.update_available == 'true'
+      run: |
+        zip -r "default-arm64-v8a.jar" "lib/arm64-v8a"
+        zip -r "default-armeabi-v7a.jar" "lib/armeabi-v7a"
+        zip -r "default-x86.jar" "lib/x86"
+        zip -r "default-x86_64.jar" "lib/x86_64"
+        md5sum *.jar > default_md5.txt
+
+    - name: 创建Release
+      if: env.update_available == 'true'
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.tag_date }}
+        release_name: Release ${{ env.tag_date }}
+        draft: false
+        prerelease: false
+
+    - name: 上传Release资产
+      if: env.update_available == 'true'
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        files: |
+          *.jar
+          default_md5.txt
+        tag_name: ${{ env.tag_date }}
+
+    - name: 提交版本更新
+      if: env.update_available == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add last_version.txt
+        git commit -m "Update libmpv-android to version ${{ env.latest_version }}"
+        git push
