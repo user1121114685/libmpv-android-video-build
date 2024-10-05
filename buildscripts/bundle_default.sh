@@ -53,17 +53,14 @@ zip -r "default-armeabi-v7a.jar"              "$jniLibs_dir/armeabi-v7a"
 zip -r "default-x86.jar"                      "$jniLibs_dir/x86"
 zip -r "default-x86_64.jar"                   "$jniLibs_dir/x86_64"
 
-cd ../..
+#cd ../../
 
-mkdir -p ../../output
+mkdir -p ../../../../output
 
-cp *.jar ../../output
+cp *.jar ../../../../output
 
-md5sum *.jar > ../../output/default_md5.txt
+md5sum *.jar > ../../../../output/default_md5.txt
 
-cd ..
+cd ../../..
 
-# --------------------------------------------------
 
-zip -r debug-symbols-default.zip prefix/*/lib
-cp debug-symbols-default.zip ../output
