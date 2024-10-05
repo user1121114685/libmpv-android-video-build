@@ -76,18 +76,36 @@ jobs:
         zip -r "default-x86_64.jar" "lib/x86_64"
         md5sum *.jar > default_md5.txt
 
-    - name: 创建Release
+    - name: 检查Release是否存在
       if: env.update_available == 'true'
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ env.tag_date }}
-        release_name: Release ${{ env.tag_date }}
-        draft: false
-        prerelease: false
+      id: check_release
+      run: |
+        release_id=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ env.release_tag }}" \
+          | jq -r '.id')
+        if [ "$release_id" != "null" ]; then
+          echo "release_exists=true" >> $GITHUB_ENV
+          echo "release_id=$release_id" >> $GITHUB_ENV
+        else
+          echo "release_exists=false" >> $GITHUB_ENV
+        fi
 
+    - name: 创建或更新Release
+      if: env.update_available == 'true'
+      run: |
+        if [ "${{ env.release_exists }}" == "true" ]; then
+          curl -X PATCH \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/${{ env.release_id }}" \
+            -d '{"tag_name":"${{ env.release_tag }}","name":"Release ${{ env.release_tag }}","body":"Updated release for ${{ env.latest_version }}"}'
+        else
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/releases" \
+            -d '{"tag_name":"${{ env.release_tag }}","name":"Release ${{ env.release_tag }}","body":"New release for ${{ env.latest_version }}"}'
+        fi
     - name: 上传到Release
       if: env.update_available == 'true'
       uses: softprops/action-gh-release@v1
