@@ -57,6 +57,7 @@ jobs:
         mkdir -p temp_lib
         unzip -q libmpv-release.aar -d temp_lib
         mkdir -p lib/{arm64-v8a,armeabi-v7a,x86,x86_64}
+        rm -f temp_lib/jni/*/libplayer.so
         mv temp_lib/jni/arm64-v8a/* lib/arm64-v8a/
         mv temp_lib/jni/armeabi-v7a/* lib/armeabi-v7a/
         mv temp_lib/jni/x86/* lib/x86/
