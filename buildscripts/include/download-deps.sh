@@ -47,7 +47,5 @@ mkdir -p deps && cd deps
 # media-kit-android-helper
 [ ! -d media-kit-android-helper ] && git clone --depth 1 --branch main https://github.com/media-kit/media-kit-android-helper.git
 
-# media_kit
-[ ! -d media_kit ] && git clone --depth 1 --single-branch --branch main https://github.com/media-kit/media-kit.git media_kit
 
 cd ..

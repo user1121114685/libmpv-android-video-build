@@ -45,13 +45,13 @@ ln -sf "$c_shere_so/aarch64-linux-android/libc++_shared.so" "$jniLibs_dir/arm64-
 ln -sf "$c_shere_so/arm-linux-androideabi/libc++_shared.so" "$jniLibs_dir/armeabi-v7a"
 ln -sf "$c_shere_so/i686-linux-android/libc++_shared.so" "$jniLibs_dir/x86"
 ln -sf "$c_shere_so/x86_64-linux-android/libc++_shared.so" "$jniLibs_dir/x86_64"
-tree -d $c_shere_so
-tree -a
+tree -d ../libmpv/src/main/jniLibs
+#tree -a
 
-zip -r "default-arm64-v8a.jar"                lib/arm64-v8a
-zip -r "default-armeabi-v7a.jar"              lib/armeabi-v7a
-zip -r "default-x86.jar"                      lib/x86
-zip -r "default-x86_64.jar"                   lib/x86_64
+zip -r "default-arm64-v8a.jar"                "$jniLibs_dir/arm64-v8a"
+zip -r "default-armeabi-v7a.jar"              "$jniLibs_dir/armeabi-v7a"
+zip -r "default-x86.jar"                      "$jniLibs_dir/x86"
+zip -r "default-x86_64.jar"                   "$jniLibs_dir/x86_64"
 
 cd ../..
 
