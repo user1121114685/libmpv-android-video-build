@@ -54,8 +54,14 @@ jobs:
     - name: 提取并合并库文件
       if: env.update_available == 'true'
       run: |
+        mkdir -p temp_lib
+        unzip -q libmpv-release.aar -d temp_lib
         mkdir -p lib/{arm64-v8a,armeabi-v7a,x86,x86_64}
-        unzip -j libmpv-release.aar 'jni/*' -d lib
+        mv temp_lib/jni/arm64-v8a/* lib/arm64-v8a/
+        mv temp_lib/jni/armeabi-v7a/* lib/armeabi-v7a/
+        mv temp_lib/jni/x86/* lib/x86/
+        mv temp_lib/jni/x86_64/* lib/x86_64/
+        rm -rf temp_lib
         cp media-kit-android-helper/app/build/outputs/apk/release/lib/*/libmediakitandroidhelper.so lib/
 
     - name: 创建JAR文件并计算MD5
@@ -79,7 +85,7 @@ jobs:
         draft: false
         prerelease: false
 
-    - name: 上传Release资产
+    - name: 上传到Release
       if: env.update_available == 'true'
       uses: softprops/action-gh-release@v1
       env:
