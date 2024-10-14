@@ -1,15 +1,18 @@
 name: Build libmpv-android
 
-on: 
+on:
   push:
     branches:
       - main
   pull_request:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -20,21 +23,39 @@ jobs:
           java-version: 17
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@v1
+        with:
+          channel: "stable"
       - name: Symlink SDK
         working-directory: ./buildscripts
         run: |
           mkdir sdk
           ln -s ${ANDROID_HOME} ./sdk/android-sdk-linux
-      - name: Download dependencies
+      - name: Bundle (default)
         working-directory: ./buildscripts
-        run: ./download.sh
-      - name: Apply patches
+        run: |
+          sudo chmod +x bundle_default.sh
+          ./bundle_default.sh
+      - name: Bundle (full)
         working-directory: ./buildscripts
-        run: ./patch.sh
-      - name: Build
+        run: |
+          sudo chmod +x bundle_full.sh
+          ./bundle_full.sh
+      - name: Bundle (encoders-gpl)
         working-directory: ./buildscripts
-        run: ./build.sh
+        run: |
+          sudo chmod +x bundle_encoders-gpl.sh
+          ./bundle_encoders-gpl.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: libmpv-release.aar
-          path: ./libmpv/build/outputs/aar/libmpv-release.aar
+          name: artifact
+          path: ./buildscripts/*.jar
+      - uses: softprops/action-gh-release@v1
+        if: github.ref == 'refs/heads/main'
+        with:
+          draft: true
+          prerelease: false
+          tag_name: "vnext"
+          files: |
+            buildscripts/*.jar

@@ -5,7 +5,7 @@ cd "$( dirname "${BASH_SOURCE[0]}" )"
 
 cleanbuild=0
 nodeps=0
-target=mpv-android
+target=mpv
 archs=(armv7l arm64 x86 x86_64)
 
 getdeps () {
@@ -15,9 +15,8 @@ getdeps () {
 
 loadarch () {
 	unset CC CXX CPATH LIBRARY_PATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH
-  unset CFLAGS CXXFLAGS CPPFLAGS LDFLAGS
 
-	local apilvl=26
+	local apilvl=21
 	# ndk_triple: what the toolchain actually is
 	# cc_triple: what Google pretends the toolchain is
 	if [ "$1" == "armv7l" ]; then
@@ -47,6 +46,11 @@ loadarch () {
 	export prefix_dir="$PWD/prefix/$prefix_name"
 	export native_dir="$PWD/../libmpv/src/main/jniLibs/$prefix_name"
 	export CC=$cc_triple-clang
+	if [[ "$1" == arm* ]]; then
+		export AS="$CC"
+	else
+		export AS="nasm"
+	fi
 	export CXX=$cc_triple-clang++
 	export LDFLAGS="-Wl,-O1,--icf=safe -Wl,-z,max-page-size=16384"
 	export AR=llvm-ar
@@ -91,7 +95,7 @@ CROSSFILE
 }
 
 build () {
-	if [ $1 != "mpv-android" ] && [ ! -d deps/$1 ]; then
+	if [ ! -d deps/$1 ]; then
 		printf >&2 '\e[1;31m%s\e[m\n' "Target $1 not found"
 		return 1
 	fi
@@ -103,23 +107,14 @@ build () {
 			build $dep
 		done
 	fi
-	if [ "$1" != "mpv-android" ]; then
-	  printf >&2 '\e[1;34m%s\e[m\n' "Building $1..."
-		pushd deps/$1
-		BUILDSCRIPT=../../scripts/$1.sh
-		[ $cleanbuild -eq 1 ] && $BUILDSCRIPT clean
+
+	printf >&2 '\e[1;34m%s\e[m\n' "Building $1..."
+	pushd deps/$1
+	BUILDSCRIPT=../../scripts/$1.sh
+ 	sudo chmod +x $BUILDSCRIPT
+	[ $cleanbuild -eq 1 ] && $BUILDSCRIPT clean
     $BUILDSCRIPT build
     popd
-	fi
-}
-
-assemble () {
-  printf >&2 '\e[1;34m%s\e[m\n' "Assembling $1..."
-  pushd ..
-  BUILDSCRIPT=buildscripts/scripts/mpv-android.sh
-  [ $cleanbuild -eq 1 ] && $BUILDSCRIPT clean
-  $BUILDSCRIPT build
-  popd
 }
 
 usage () {
@@ -164,12 +159,6 @@ else
   loadarch $arch
   setup_prefix
   build $target
-fi
-
-if [ "$target" == "mpv-android" ]; then
-  assemble
-	[ -d ../libmpv/build/outputs/aar ] && ls -lh ../libmpv/build/outputs/aar/*.aar
-	[ -d ../libmpv/build/libs ] && ls -lh ../libmpv/build/libs/*.jar
 fi
 
 exit 0

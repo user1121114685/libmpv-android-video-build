@@ -17,10 +17,15 @@ fi
 unset CC CXX # meson wants these unset
 
 meson setup $build --cross-file "$prefix_dir"/crossfile.txt \
+	--prefer-static \
 	--default-library shared \
-	-Diconv=disabled -Dlua=enabled \
-	-Dlibmpv=true -Dcplayer=false \
-	-Dmanpage-build=disabled
+	-Dgpl=false \
+	-Dlibmpv=true \
+ 	-Dcplayer=false \
+ 	-Dlua=disabled \
+	-Diconv=disabled \
+	-Djavascript=disabled \
+ 	-Dmanpage-build=disabled
 
 ninja -C $build -j$cores
 DESTDIR="$prefix_dir" ninja -C $build install

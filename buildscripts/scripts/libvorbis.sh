@@ -14,10 +14,13 @@ else
 	exit 255
 fi
 
+cp ../../scripts/libvorbis.build meson.build
+# -mno-ieee-fp is not supported by clang
+sed s/\-mno\-ieee\-fp// -i {configure,configure.ac}
+
 unset CC CXX # meson wants these unset
 
-meson setup $build --cross-file "$prefix_dir"/crossfile.txt \
-	-Denable_tests=false -Db_lto=true -Dstack_alignment=16
+CFLAGS=-fPIC CXXFLAGS=-fPIC meson setup $build --cross-file "$prefix_dir"/crossfile.txt -Ddefault_library=static
 
-ninja -C $build -j$cores
+meson compile -C $build libvorbis
 DESTDIR="$prefix_dir" ninja -C $build install
