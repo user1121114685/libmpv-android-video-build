@@ -39,11 +39,11 @@ jobs:
         run: |
           sudo chmod +x bundle_default.sh
           ./bundle_default.sh
-      - name: Bundle (full)
-        working-directory: ./buildscripts
-        run: |
-          sudo chmod +x bundle_full.sh
-          ./bundle_full.sh
+      # - name: Bundle (full)
+      #   working-directory: ./buildscripts
+      #   run: |
+      #     sudo chmod +x bundle_full.sh
+      #     ./bundle_full.sh
       - uses: actions/upload-artifact@v4
         with:
           name: artifact
