@@ -37,9 +37,30 @@ cp app/build/outputs/apk/release/lib/x86_64/libmediakitandroidhelper.so         
 
 cd ../..
 
-zip -r default-arm64-v8a.jar                prefix/arm64-v8a/usr/local/lib/*.so
-zip -r default-armeabi-v7a.jar              prefix/armeabi-v7a/usr/local/lib/*.so
-zip -r default-x86.jar                      prefix/x86/usr/local/lib/*.so
-zip -r default-x86_64.jar                   prefix/x86_64/usr/local/lib/*.so
+# Function to create JAR with desired structure
+create_jar() {
+    arch=$1
+    src_dir="prefix/$arch/usr/local/lib"
+    jar_name="default-$arch.jar"
+    
+    # Create a temporary directory
+    temp_dir=$(mktemp -d)
+    
+    # Copy .so files to the temporary directory with desired structure
+    mkdir -p "$temp_dir/lib/$arch"
+    cp "$src_dir"/*.so "$temp_dir/lib/$arch/"
+    
+    # Create the JAR file
+    (cd "$temp_dir" && zip -r "../../$jar_name" lib)
+    
+    # Clean up
+    rm -rf "$temp_dir"
+}
+
+# Create JARs for each architecture
+create_jar "arm64-v8a"
+create_jar "armeabi-v7a"
+create_jar "x86"
+create_jar "x86_64"
 
 md5sum *.jar
