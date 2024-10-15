@@ -3,6 +3,9 @@ name: Build libmpv-android
 on:
   # 手动触发事件
   workflow_dispatch:
+    # 定时检查
+  schedule:
+    - cron: '0 14 * * 1'
   push:
     branches:
       - main
@@ -16,6 +19,27 @@ jobs:
     name: Build
     runs-on: ubuntu-22.04
     steps:
+      - name: Show Space
+        run: |
+          df -hT $PWD
+      - name: Free Disk Space (Ubuntu)
+        uses: insightsengineering/disk-space-reclaimer@v1
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tools-cache: false
+
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: false
+          dotnet: true
+          haskell: true
+          large-packages: true
+          swap-storage: true
+          docker-images: true
+      - name: Show Space
+        run: |
+          df -hT $PWD
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Setup Java JDK
@@ -29,6 +53,11 @@ jobs:
         uses: subosito/flutter-action@v1
         with:
           channel: "stable"
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "^1.x"
+          check-latest: true
       - name: Symlink SDK
         working-directory: ./buildscripts
         run: |
@@ -48,11 +77,13 @@ jobs:
         with:
           name: artifact
           path: ./buildscripts/*.jar
+      - id: set_tag_date
+        run: echo "tag_date=$(date +'%Y%m%d')" >> $GITHUB_ENV
       - uses: softprops/action-gh-release@v1
         if: github.ref == 'refs/heads/main'
         with:
-          draft: true
+          draft: false
           prerelease: false
-          tag_name: "vnext"
+          tag_name: ${{ env.tag_date }}
           files: |
             buildscripts/*.jar
