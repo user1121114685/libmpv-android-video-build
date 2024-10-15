@@ -1,6 +1,8 @@
 name: Build libmpv-android
 
 on:
+  # 手动触发事件
+  workflow_dispatch:
   push:
     branches:
       - main
