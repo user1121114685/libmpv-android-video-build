@@ -41,6 +41,8 @@ cpuflags=
 	--enable-decoders \
 	--enable-demuxers \
 	--enable-parsers \
+	--enable-decoder=pgssub \
+	--enable-demuxer=sup \
 	\
 	--disable-muxers \
 	--disable-encoders \

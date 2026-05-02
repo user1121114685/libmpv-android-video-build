@@ -37,6 +37,8 @@ cp app/build/outputs/apk/release/lib/x86_64/libmediakitandroidhelper.so         
 
 cd ../..
 
+rm -rf temp
+
 mkdir -p temp/lib/arm64-v8a
 mkdir -p temp/lib/armeabi-v7a
 mkdir -p temp/lib/x86
@@ -49,13 +51,27 @@ cp prefix/x86_64/usr/local/lib/*.so temp/lib/x86_64/
 
 cd temp
 
-zip -r ../full-arm64-v8a.jar lib/arm64-v8a
-zip -r ../full-armeabi-v7a.jar lib/armeabi-v7a
-zip -r ../full-x86.jar lib/x86
-zip -r ../full-x86_64.jar lib/x86_64
+FIXED_TIME="2025-01-01 00:00:00"
+
+find "lib" -type d -exec touch -d "$FIXED_TIME" {} +
+find "lib/arm64-v8a" -type f -name "*.so" -exec touch -d "$FIXED_TIME" {} +
+find "lib/armeabi-v7a" -type f -name "*.so" -exec touch -d "$FIXED_TIME" {} +
+find "lib/x86" -type f -name "*.so" -exec touch -d "$FIXED_TIME" {} +
+find "lib/x86_64" -type f -name "*.so" -exec touch -d "$FIXED_TIME" {} +
+
+md5sum lib/arm64-v8a/*.so
+md5sum lib/armeabi-v7a/*.so
+md5sum lib/x86/*.so
+md5sum lib/x86_64/*.so
+
+find lib/arm64-v8a -type f | sort | zip -r -X ../full-arm64-v8a.jar -@
+find lib/armeabi-v7a -type f | sort | zip -r -X ../full-armeabi-v7a.jar -@
+find lib/x86 -type f | sort | zip -r -X ../full-x86.jar -@
+find lib/x86_64 -type f | sort | zip -r -X ../full-x86_64.jar -@
 
 cd ../
 
 pwd
 
-md5sum *.jar
+md5sum full-*.jar > full.md5
+cat full.md5

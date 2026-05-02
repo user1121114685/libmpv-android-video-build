@@ -61,15 +61,25 @@ jobs:
           sudo chmod +x include/download-sdk-debian.sh
           sudo chmod +x bundle_default.sh
           ./bundle_default.sh
+      - name: Bundle (full)
+        working-directory: ./buildscripts
+        run: |
+          sudo chmod +x bundle_full.sh
+          ./bundle_full.sh
       - uses: actions/upload-artifact@v4
         with:
           name: artifact
-          path: /home/runner/work/libmpv-android-video-build/libmpv-android-video-build/buildscripts/*.jar
+          path: |
+            /home/runner/work/libmpv-android-video-build/libmpv-android-video-build/buildscripts/*.jar
+            /home/runner/work/libmpv-android-video-build/libmpv-android-video-build/buildscripts/*.md5
+      - id: set_tag_date
+        run: echo "tag_date=$(date +'%Y%m%d')" >> $GITHUB_ENV
       - uses: softprops/action-gh-release@v1
         if: github.ref == 'refs/heads/main' || inputs.release == true
         with:
-          draft: true
+          draft: false
           prerelease: false
-          tag_name: "vnext"
+          tag_name: ${{ env.tag_date }}
           files: |
             /home/runner/work/libmpv-android-video-build/libmpv-android-video-build/buildscripts/*.jar
+            /home/runner/work/libmpv-android-video-build/libmpv-android-video-build/buildscripts/*.md5

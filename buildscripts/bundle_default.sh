@@ -71,4 +71,5 @@ cd ../
 
 pwd
 
-md5sum *.jar
+md5sum default-*.jar > default.md5
+cat default.md5
